@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    groups:
+      gems:
+        patterns: ["*"]
