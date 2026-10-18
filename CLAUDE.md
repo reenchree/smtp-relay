@@ -27,4 +27,6 @@ Roles live in `../terraform-core/` (`k8s_irsa.tf`, `blr_k8s_irsa.tf`). The polic
 - Never log message bodies; the smoke test greps for this.
 - The image runs read-only as uid 65534; keep it that way (no tmp writes, no bootsnap).
 - CI publishes only from `main`, after unit tests and the amd64+arm64 smoke pass. Actions and the base image are pinned by SHA/digest; Dependabot bumps them.
-- Image tags are `0.1.<run_number>`, so Renovate in the flux repos can order them. Flux pins `:<tag>@sha256:<digest>`. Renaming `ci.yml` resets `run_number`; bump the minor (`0.2.`) if that happens.
+- Images: private ECR `smtp-relay`, **arm64-only**, because ECR's lifecycle rule expires untagged images and that would include multi-arch children. Tags are `0.1.<run_number>` (gappy, since PR runs consume numbers too). Flux pins `:<tag>@sha256:<digest>`; bump by hand, as Renovate skips ECR. Renaming `ci.yml` resets `run_number`; bump the minor (`0.2.`) if that happens.
+- Push trust: this repo uses GitHub's immutable OIDC subject, trusted explicitly on `main` in terraform-core `iam_github.tf`.
+- Pull: the External Secrets `ECRAuthorizationToken` generator with SA `ecr-pull` (annotation `eks.amazonaws.com/role-arn` → `sea-k8s-ecr-pull` / `blr-k8s-ecr-pull`) feeds Secret `ecr-creds`.

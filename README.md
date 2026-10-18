@@ -48,8 +48,10 @@ docker build -t smtp-relay:local . && test/smoke.sh smtp-relay:local
 
 ## Images
 
-CI (`.github/workflows/ci.yml`) runs unit tests, then the smoke test on amd64 and arm64. Only on `main`, it then pushes `ghcr.io/reenchree/smtp-relay:{0.1.<run>,sha-<sha>,latest}` with a build-provenance attestation:
+CI (`.github/workflows/ci.yml`) runs unit tests, then the smoke test on amd64 and arm64. Only on `main`, it then pushes an arm64 image to private ECR, as `051946164308.dkr.ecr.us-west-2.amazonaws.com/smtp-relay:{0.1.<run>,sha-<sha>,latest}` via `GitHubOIDCECRPushRole`. Each push gets a build-provenance attestation stored in GitHub:
 
 ```sh
-gh attestation verify oci://ghcr.io/reenchree/smtp-relay@sha256:<digest> -R reenchree/smtp-relay
+gh attestation verify oci://051946164308.dkr.ecr.us-west-2.amazonaws.com/smtp-relay@sha256:<digest> -R reenchree/smtp-relay
 ```
+
+(This needs `aws ecr get-login-password | docker login …` first.) Clusters pull with an `ecr-creds` Secret minted by External Secrets Operator (`ECRAuthorizationToken`, IRSA role `*-k8s-ecr-pull`).
